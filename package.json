@@ -1,0 +1,70 @@
+{
+  "name": "smart-skill-matrix",
+  "version": "1.4.0",
+  "description": "A comprehensive skill management and objective tracking system",
+  "main": "index.js",
+  "scripts": {
+    "install": "npm install --prefix backend && npm install --prefix frontend && npm install --prefix mails",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\" \"npm run start:email\"",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm start",
+    "start:email": "cd mails && npm start",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:email\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:email": "cd mails && npm run dev",
+    "build": "npm run build:frontend && npm run build:backend && npm run build:email",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build:email": "cd mails && npm run build",
+    "test": "npm run test:frontend && npm run test:backend && npm run test:email",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && npm test",
+    "test:email": "cd mails && npm test",
+    "test:coverage": "npm run test:frontend -- --coverage && npm run test:backend -- --coverage && npm run test:email -- --coverage",
+    "lint": "npm run lint:frontend && npm run lint:backend && npm run lint:email",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:email": "cd mails && npm run lint",
+    "clean": "npm run clean:frontend && npm run clean:backend && npm run clean:email",
+    "clean:frontend": "cd frontend && rm -rf node_modules build",
+    "clean:backend": "cd backend && rm -rf node_modules",
+    "clean:email": "cd mails && rm -rf node_modules",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:restart": "docker-compose restart",
+    "setup": "npm install && npm run setup:env && npm run setup:database",
+    "setup:env": "node scripts/setup-env.js",
+    "setup:database": "psql -d smart_skill_matrix -f database/migration.sql && psql -d smart_skill_matrix -f database/seed.sql",
+    "cleanup": "npm run clean && rm -rf node_modules"
+  },
+  "keywords": [
+    "skill-management",
+    "objective-tracking",
+    "employee-development",
+    "performance-management",
+    "react",
+    "nodejs",
+    "postgresql",
+    "docker"
+  ],
+  "author": "Smart Skill Matrix Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/smart-skill-matrix.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/smart-skill-matrix/issues"
+  },
+  "homepage": "https://github.com/yourusername/smart-skill-matrix#readme",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
