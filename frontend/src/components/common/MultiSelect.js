@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, XMarkIcon, CheckIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 const MultiSelect = ({ 
   options, 
@@ -7,7 +7,8 @@ const MultiSelect = ({
   onChange, 
   placeholder = "Sélectionner...",
   label,
-  className = ""
+  className = "",
+  variant = "default" // "default", "modern", "minimal"
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,79 +49,108 @@ const MultiSelect = ({
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
           {label}
         </label>
       )}
       
       <div
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 cursor-pointer bg-white"
+        className={`w-full px-4 py-3 border-2 rounded-xl cursor-pointer bg-white transition-all duration-200
+          ${isOpen 
+            ? 'border-blue-500 ring-4 ring-blue-100 shadow-lg' 
+            : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+          }`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex flex-wrap gap-1 min-h-[20px]">
+        <div className="flex flex-wrap gap-2 min-h-[24px] pr-6">
           {selectedOptions.length > 0 ? (
             selectedOptions.map(option => (
               <span
                 key={option.id}
-                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800"
+                className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-sm transform transition-all duration-200 hover:scale-105"
               >
                 {option.name || option.title}
                 <button
                   type="button"
                   onClick={(e) => handleRemoveOption(option.id, e)}
-                  className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full text-blue-400 hover:bg-blue-200 hover:text-blue-500"
+                  className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white/20 hover:bg-white/30 transition-colors duration-200"
                 >
                   <XMarkIcon className="w-3 h-3" />
                 </button>
               </span>
             ))
           ) : (
-            <span className="text-gray-500">{placeholder}</span>
+            <span className="text-gray-400 font-medium">{placeholder}</span>
           )}
         </div>
-        <ChevronDownIcon className={`absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <div className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+          <ChevronDownIcon className="h-5 w-5 text-gray-400" />
+        </div>
       </div>
 
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-          <div className="p-2">
-            <input
-              type="text"
-              placeholder="Rechercher..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              onClick={(e) => e.stopPropagation()}
-            />
+        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+          {/* Search Input */}
+          <div className="p-3 border-b border-gray-100 bg-gray-50/50">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Rechercher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 bg-white"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
           </div>
           
-          <div className="max-h-48 overflow-auto">
+          {/* Options List */}
+          <div className="max-h-56 overflow-auto p-2">
             {filteredOptions.length > 0 ? (
-              filteredOptions.map(option => (
-                <div
-                  key={option.id}
-                  className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
-                    value.includes(option.id) ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                  }`}
-                  onClick={() => handleToggleOption(option.id)}
-                >
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={value.includes(option.id)}
-                      onChange={() => {}}
-                      className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    {option.name || option.title}
+              filteredOptions.map(option => {
+                const isSelected = value.includes(option.id);
+                return (
+                  <div
+                    key={option.id}
+                    className={`flex items-center px-4 py-3 cursor-pointer rounded-xl mb-1 transition-all duration-200 ${
+                      isSelected 
+                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200' 
+                        : 'hover:bg-gray-50 border-2 border-transparent'
+                    }`}
+                    onClick={() => handleToggleOption(option.id)}
+                  >
+                    <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center mr-3 transition-all duration-200 ${
+                      isSelected 
+                        ? 'bg-gradient-to-r from-blue-500 to-indigo-500 border-transparent' 
+                        : 'border-gray-300 bg-white'
+                    }`}>
+                      {isSelected && <CheckIcon className="w-3 h-3 text-white" />}
+                    </div>
+                    <span className={`font-medium ${isSelected ? 'text-blue-700' : 'text-gray-700'}`}>
+                      {option.name || option.title}
+                    </span>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
-              <div className="px-3 py-2 text-gray-500 text-sm">
-                Aucune option trouvée
+              <div className="px-4 py-8 text-center">
+                <div className="text-gray-400 mb-2">
+                  <MagnifyingGlassIcon className="w-8 h-8 mx-auto" />
+                </div>
+                <p className="text-gray-500 text-sm font-medium">Aucune option trouvée</p>
               </div>
             )}
           </div>
+
+          {/* Footer with count */}
+          {selectedOptions.length > 0 && (
+            <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
+              <p className="text-xs font-semibold text-gray-500">
+                {selectedOptions.length} sélectionné{selectedOptions.length > 1 ? 's' : ''}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

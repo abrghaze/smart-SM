@@ -20,7 +20,6 @@ const NotificationPanel = ({ isOpen, onClose, onNotificationsUpdated }) => {
       const response = await dataService.getNotifications();
       setNotifications(response.notifications || []);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
       toast.error('Erreur lors du chargement des notifications');
     } finally {
       setLoading(false);
@@ -47,7 +46,6 @@ const NotificationPanel = ({ isOpen, onClose, onNotificationsUpdated }) => {
       
       toast.success('Notification marquée comme lue');
     } catch (error) {
-      console.error('Error marking notification as read:', error);
       toast.error('Erreur lors de la mise à jour de la notification');
     }
   };
@@ -73,7 +71,6 @@ const NotificationPanel = ({ isOpen, onClose, onNotificationsUpdated }) => {
       
       toast.success('Toutes les notifications ont été marquées comme lues');
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
       toast.error('Erreur lors de la mise à jour des notifications');
     } finally {
       setMarkingAsRead(false);
@@ -142,24 +139,32 @@ const NotificationPanel = ({ isOpen, onClose, onNotificationsUpdated }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-end p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[80vh] flex flex-col">
+    <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-start justify-end animate-fade-in">
+      <div 
+        className="bg-white shadow-2xl w-full max-w-md h-full flex flex-col animate-slide-in-right"
+        style={{ maxHeight: '100vh' }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">Notifications</h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {notifications.filter(n => !n.is_read).length} non lue(s)
+            </p>
+          </div>
+          <div className="flex items-center space-x-3">
             {notifications.some(n => !n.is_read) && (
               <button
                 onClick={markAllAsRead}
                 disabled={markingAsRead}
-                className="text-sm text-blue-600 hover:text-blue-800 disabled:opacity-50"
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50 transition-colors"
               >
                 {markingAsRead ? 'Marquage...' : 'Tout marquer comme lu'}
               </button>
             )}
             <button
               onClick={onClose}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
             >
               <XMarkIcon className="h-5 w-5 text-gray-500" />
             </button>
@@ -169,44 +174,54 @@ const NotificationPanel = ({ isOpen, onClose, onNotificationsUpdated }) => {
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
           {loading ? (
-            <div className="p-4 text-center text-gray-500">
-              Chargement des notifications...
+            <div className="p-8 text-center">
+              <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-3"></div>
+              <p className="text-sm text-gray-500">Chargement des notifications...</p>
             </div>
           ) : notifications.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              Aucune notification
+            <div className="p-8 text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🔔</span>
+              </div>
+              <p className="text-gray-500 font-medium">Aucune notification</p>
+              <p className="text-sm text-gray-400 mt-1">Vous êtes à jour !</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
-              {notifications.map((notification) => (
+            <div className="divide-y divide-gray-50">
+              {notifications.map((notification, index) => (
                 <div
                   key={notification.id}
-                  className={`p-4 border-l-4 ${getNotificationColor(notification.type, notification.is_read)} hover:bg-gray-50 transition-colors`}
+                  className={`p-4 border-l-4 ${getNotificationColor(notification.type, notification.is_read)} hover:bg-white transition-all duration-200 cursor-pointer`}
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="flex items-start space-x-3">
-                    <div className="text-lg">
+                    <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-lg flex-shrink-0">
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h3 className={`text-sm font-medium ${notification.is_read ? 'text-gray-600' : 'text-gray-900'}`}>
+                          <h3 className={`text-sm font-semibold ${notification.is_read ? 'text-gray-500' : 'text-gray-900'}`}>
                             {notification.title}
                           </h3>
-                          <p className={`text-sm mt-1 ${notification.is_read ? 'text-gray-500' : 'text-gray-700'}`}>
+                          <p className={`text-sm mt-1 leading-relaxed ${notification.is_read ? 'text-gray-400' : 'text-gray-600'}`}>
                             {notification.body}
                           </p>
-                          <p className="text-xs text-gray-400 mt-2">
+                          <p className="text-xs text-gray-400 mt-2 flex items-center">
+                            <span className="w-1.5 h-1.5 bg-gray-300 rounded-full mr-1.5"></span>
                             {formatDate(notification.created_at)}
                           </p>
                         </div>
                         {!notification.is_read && (
                           <button
-                            onClick={() => markAsRead(notification.id)}
-                            className="ml-2 p-1 hover:bg-gray-200 rounded-full transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              markAsRead(notification.id);
+                            }}
+                            className="ml-2 p-2 hover:bg-blue-50 rounded-xl transition-colors group"
                             title="Marquer comme lu"
                           >
-                            <CheckIcon className="h-4 w-4 text-gray-500" />
+                            <CheckIcon className="h-4 w-4 text-gray-400 group-hover:text-blue-500" />
                           </button>
                         )}
                       </div>
@@ -216,6 +231,16 @@ const NotificationPanel = ({ isOpen, onClose, onNotificationsUpdated }) => {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+          <button
+            onClick={onClose}
+            className="w-full py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            Fermer
+          </button>
         </div>
       </div>
     </div>

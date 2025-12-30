@@ -1,7 +1,9 @@
 import React from 'react';
 import {
   ExclamationTriangleIcon,
-  XMarkIcon
+  XMarkIcon,
+  CheckCircleIcon,
+  InformationCircleIcon
 } from '@heroicons/react/24/outline';
 
 const ConfirmationModal = ({ 
@@ -13,59 +15,113 @@ const ConfirmationModal = ({
   confirmText = 'Confirmer',
   cancelText = 'Annuler',
   confirmButtonColor = 'red',
-  icon: Icon = ExclamationTriangleIcon 
+  icon: Icon = ExclamationTriangleIcon,
+  type = 'danger' // 'danger', 'warning', 'info', 'success'
 }) => {
   if (!isOpen) return null;
 
-  const getButtonClasses = () => {
-    const baseClasses = 'inline-flex justify-center rounded-md border px-4 py-2 text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm';
-    
-    if (confirmButtonColor === 'red') {
-      return `${baseClasses} border-transparent bg-red-600 text-white hover:bg-red-700 focus:ring-red-500`;
-    } else if (confirmButtonColor === 'blue') {
-      return `${baseClasses} border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500`;
-    } else {
-      return `${baseClasses} border-transparent bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500`;
+  const getIconConfig = () => {
+    switch (type) {
+      case 'success':
+        return { 
+          bgColor: 'bg-emerald-50', 
+          iconColor: 'text-emerald-600',
+          icon: CheckCircleIcon
+        };
+      case 'warning':
+        return { 
+          bgColor: 'bg-amber-50', 
+          iconColor: 'text-amber-600',
+          icon: ExclamationTriangleIcon
+        };
+      case 'info':
+        return { 
+          bgColor: 'bg-blue-50', 
+          iconColor: 'text-blue-600',
+          icon: InformationCircleIcon
+        };
+      case 'danger':
+      default:
+        return { 
+          bgColor: 'bg-red-50', 
+          iconColor: 'text-red-600',
+          icon: ExclamationTriangleIcon
+        };
     }
   };
 
+  const getButtonClasses = () => {
+    const baseClasses = 'inline-flex justify-center items-center px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
+    
+    switch (confirmButtonColor) {
+      case 'red':
+        return `${baseClasses} bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 focus:ring-red-500`;
+      case 'blue':
+        return `${baseClasses} bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 focus:ring-blue-500`;
+      case 'green':
+        return `${baseClasses} bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 focus:ring-emerald-500`;
+      default:
+        return `${baseClasses} bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white shadow-lg shadow-gray-500/25 focus:ring-gray-500`;
+    }
+  };
+
+  const iconConfig = getIconConfig();
+  const IconComponent = Icon || iconConfig.icon;
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose}></div>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity animate-fade-in" 
+        onClick={onClose}
+      ></div>
 
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div className="sm:flex sm:items-start">
-              <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                <Icon className="h-6 w-6 text-red-600" />
+      {/* Modal */}
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full animate-scale-in overflow-hidden">
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-200"
+          >
+            <XMarkIcon className="w-5 h-5" />
+          </button>
+
+          {/* Content */}
+          <div className="p-6">
+            <div className="flex items-start space-x-4">
+              {/* Icon */}
+              <div className={`flex-shrink-0 w-12 h-12 rounded-full ${iconConfig.bgColor} flex items-center justify-center`}>
+                <IconComponent className={`w-6 h-6 ${iconConfig.iconColor}`} />
               </div>
-              <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
+
+              {/* Text */}
+              <div className="flex-1 min-w-0 pt-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {title}
                 </h3>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">
-                    {message}
-                  </p>
-                </div>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  {message}
+                </p>
               </div>
             </div>
           </div>
-          <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+
+          {/* Actions */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+            <button
+              type="button"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
+              onClick={onClose}
+            >
+              {cancelText}
+            </button>
             <button
               type="button"
               className={getButtonClasses()}
               onClick={onConfirm}
             >
               {confirmText}
-            </button>
-            <button
-              type="button"
-              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-              onClick={onClose}
-            >
-              {cancelText}
             </button>
           </div>
         </div>

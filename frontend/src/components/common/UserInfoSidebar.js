@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { UserIcon, CogIcon, CalendarIcon, UserGroupIcon, BuildingOfficeIcon, AcademicCapIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import { 
+  UserIcon, 
+  CogIcon, 
+  CalendarIcon, 
+  UserGroupIcon, 
+  BuildingOfficeIcon, 
+  AcademicCapIcon, 
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+  SparklesIcon
+} from '@heroicons/react/24/outline';
 import { getProfilePictureUrl } from '../../utils/imageUtils';
 import dataService from '../../services/dataService';
 
 const UserInfoSidebar = ({ isMainSidebarCollapsed = false }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [sidebarStats, setSidebarStats] = useState({});
   const [loading, setLoading] = useState(true);
@@ -19,7 +29,6 @@ const UserInfoSidebar = ({ isMainSidebarCollapsed = false }) => {
           const stats = await dataService.getSidebarStats();
           setSidebarStats(stats);
         } catch (error) {
-          console.error('Error fetching sidebar stats:', error);
           setSidebarStats({});
         } finally {
           setLoading(false);
@@ -29,14 +38,6 @@ const UserInfoSidebar = ({ isMainSidebarCollapsed = false }) => {
 
     fetchSidebarStats();
   }, [user]);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   const handleSettingsClick = () => {
     const role = user?.role;
@@ -49,330 +50,223 @@ const UserInfoSidebar = ({ isMainSidebarCollapsed = false }) => {
     }
   };
 
-  const getRoleColor = (role) => {
+  const getRoleConfig = (role) => {
     switch (role) {
       case 'admin':
-        return 'bg-blue-100 text-blue-800';
+        return {
+          gradient: 'from-red-500 to-rose-600',
+          bgLight: 'bg-red-50',
+          text: 'text-red-600',
+          label: 'Administrateur',
+          icon: '👑'
+        };
       case 'manager':
-        return 'bg-green-100 text-green-800';
+        return {
+          gradient: 'from-emerald-500 to-teal-600',
+          bgLight: 'bg-emerald-50',
+          text: 'text-emerald-600',
+          label: 'Manager',
+          icon: '🎯'
+        };
       case 'employee':
-        return 'bg-blue-100 text-blue-800';
+        return {
+          gradient: 'from-blue-500 to-indigo-600',
+          bgLight: 'bg-blue-50',
+          text: 'text-blue-600',
+          label: 'Employé',
+          icon: '💼'
+        };
       default:
-        return 'bg-gray-100 text-gray-800';
+        return {
+          gradient: 'from-gray-500 to-gray-600',
+          bgLight: 'bg-gray-50',
+          text: 'text-gray-600',
+          label: role,
+          icon: '👤'
+        };
     }
   };
 
-  const getRoleLabel = (role) => {
-    switch (role) {
-      case 'admin':
-        return 'Administrateur';
-      case 'manager':
-        return 'Manager';
-      case 'employee':
-        return 'Employé';
-      default:
-        return role;
-    }
-  };
+  const StatCard = ({ icon: Icon, label, value, color, bgColor }) => (
+    <div className={`group relative p-4 rounded-2xl ${bgColor} border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 overflow-hidden`}>
+      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/50 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
+      <div className="relative flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-xl ${color} bg-opacity-10`}>
+            <Icon className={`h-5 w-5 ${color}`} />
+          </div>
+          <span className="text-sm font-medium text-gray-600">{label}</span>
+        </div>
+        <span className={`text-lg font-bold ${color}`}>{value}</span>
+      </div>
+    </div>
+  );
 
-  const renderEmployeeStats = () => {
-    if (loading) {
+  const LoadingSkeleton = () => (
+    <div className="space-y-3">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="p-4 rounded-2xl bg-gray-50 animate-pulse">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-gray-200 rounded-xl" />
+              <div className="h-4 w-24 bg-gray-200 rounded" />
+            </div>
+            <div className="h-6 w-8 bg-gray-200 rounded" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderStats = () => {
+    if (loading) return <LoadingSkeleton />;
+
+    const statsConfig = {
+      admin: [
+        { key: 'totalUsers', label: 'Utilisateurs', icon: UserIcon, color: 'text-blue-600', bgColor: 'bg-blue-50' },
+        { key: 'totalTeams', label: 'Équipes', icon: UserGroupIcon, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
+        { key: 'totalDepartments', label: 'Départements', icon: BuildingOfficeIcon, color: 'text-purple-600', bgColor: 'bg-purple-50' },
+        { key: 'totalSkills', label: 'Compétences', icon: AcademicCapIcon, color: 'text-amber-600', bgColor: 'bg-amber-50' },
+      ],
+      manager: [
+        { key: 'managedTeams', label: 'Équipes gérées', icon: UserGroupIcon, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
+        { key: 'memberTeams', label: 'Équipes membres', icon: UserGroupIcon, color: 'text-blue-600', bgColor: 'bg-blue-50' },
+        { key: 'managedDepartments', label: 'Départements', icon: BuildingOfficeIcon, color: 'text-purple-600', bgColor: 'bg-purple-50' },
+      ],
+      employee: [
+        { key: 'skills', label: 'Compétences', icon: AcademicCapIcon, color: 'text-blue-600', bgColor: 'bg-blue-50' },
+        { key: 'teams', label: 'Équipes', icon: UserGroupIcon, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
+        { key: 'departments', label: 'Départements', icon: BuildingOfficeIcon, color: 'text-purple-600', bgColor: 'bg-purple-50' },
+      ],
+    };
+
+    const config = statsConfig[user?.role] || statsConfig.employee;
+    const visibleStats = config.filter(stat => (sidebarStats[stat.key] || 0) > 0);
+
+    if (visibleStats.length === 0) {
       return (
-        <div className="space-y-3">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <div className="text-center py-8">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 flex items-center justify-center">
+            <ChartBarIcon className="h-8 w-8 text-gray-400" />
           </div>
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          </div>
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-          </div>
-        </div>
-      );
-    }
-
-    const { skills = 0, teams = 0, departments = 0 } = sidebarStats;
-    
-    // Only show sections that have non-zero counts
-    const sections = [];
-    
-    if (skills > 0) {
-      sections.push(
-        <div key="skills" className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-          <div className="flex items-center">
-            <AcademicCapIcon className="h-4 w-4 text-blue-600 mr-2" />
-            <span className="text-sm text-gray-600">Compétences</span>
-          </div>
-          <span className="text-sm font-medium text-gray-900 bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{skills}</span>
-        </div>
-      );
-    }
-    
-    if (teams > 0) {
-      sections.push(
-        <div key="teams" className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-          <div className="flex items-center">
-            <UserGroupIcon className="h-4 w-4 text-green-600 mr-2" />
-            <span className="text-sm text-gray-600">Équipes</span>
-          </div>
-          <span className="text-sm font-medium text-gray-900 bg-green-100 text-green-800 px-2 py-1 rounded-full">{teams}</span>
-        </div>
-      );
-    }
-    
-    if (departments > 0) {
-      sections.push(
-        <div key="departments" className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-          <div className="flex items-center">
-            <BuildingOfficeIcon className="h-4 w-4 text-purple-600 mr-2" />
-            <span className="text-sm text-gray-600">Départements</span>
-          </div>
-          <span className="text-sm font-medium text-gray-900 bg-purple-100 text-purple-800 px-2 py-1 rounded-full">{departments}</span>
-        </div>
-      );
-    }
-
-    if (sections.length === 0) {
-      return (
-        <div className="text-center py-4">
           <p className="text-sm text-gray-500">Aucune statistique disponible</p>
         </div>
       );
     }
 
-    return <div className="space-y-3">{sections}</div>;
+    return (
+      <div className="space-y-3">
+        {visibleStats.map((stat) => (
+          <StatCard
+            key={stat.key}
+            icon={stat.icon}
+            label={stat.label}
+            value={sidebarStats[stat.key] || 0}
+            color={stat.color}
+            bgColor={stat.bgColor}
+          />
+        ))}
+      </div>
+    );
   };
 
-  const renderManagerStats = () => {
-    if (loading) {
-      return (
-        <div className="space-y-3">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          </div>
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          </div>
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-          </div>
-        </div>
-      );
-    }
+  if (!user) return null;
 
-    const { managedTeams = 0, memberTeams = 0, managedDepartments = 0 } = sidebarStats;
-    
-    // Only show sections that have non-zero counts
-    const sections = [];
-    
-    if (managedTeams > 0) {
-      sections.push(
-        <div key="managedTeams" className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-          <div className="flex items-center">
-            <UserGroupIcon className="h-4 w-4 text-green-600 mr-2" />
-            <span className="text-sm text-gray-600">Équipes gérées</span>
-          </div>
-          <span className="text-sm font-medium text-gray-900 bg-green-100 text-green-800 px-2 py-1 rounded-full">{managedTeams}</span>
-        </div>
-      );
-    }
-    
-    if (memberTeams > 0) {
-      sections.push(
-        <div key="memberTeams" className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-          <div className="flex items-center">
-            <UserGroupIcon className="h-4 w-4 text-blue-600 mr-2" />
-            <span className="text-sm text-gray-600">Équipes membres</span>
-          </div>
-          <span className="text-sm font-medium text-gray-900 bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{memberTeams}</span>
-        </div>
-      );
-    }
-    
-    if (managedDepartments > 0) {
-      sections.push(
-        <div key="managedDepartments" className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-          <div className="flex items-center">
-            <BuildingOfficeIcon className="h-4 w-4 text-purple-600 mr-2" />
-            <span className="text-sm text-gray-600">Départements gérés</span>
-          </div>
-          <span className="text-sm font-medium text-gray-900 bg-purple-100 text-purple-800 px-2 py-1 rounded-full">{managedDepartments}</span>
-        </div>
-      );
-    }
-
-    if (sections.length === 0) {
-      return (
-        <div className="text-center py-4">
-          <p className="text-sm text-gray-500">Aucune statistique disponible</p>
-        </div>
-      );
-    }
-
-    return <div className="space-y-3">{sections}</div>;
-  };
-
-  const renderAdminStats = () => {
-    if (loading) {
-      return (
-        <div className="space-y-3">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          </div>
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          </div>
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-          </div>
-        </div>
-      );
-    }
-
-    const { totalUsers = 0, totalTeams = 0, totalDepartments = 0, totalSkills = 0 } = sidebarStats;
-    
-    // Only show sections that have non-zero counts
-    const sections = [];
-    
-    if (totalUsers > 0) {
-      sections.push(
-        <div key="totalUsers" className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-          <div className="flex items-center">
-            <UserIcon className="h-4 w-4 text-blue-600 mr-2" />
-            <span className="text-sm text-gray-600">Utilisateurs</span>
-          </div>
-          <span className="text-sm font-medium text-gray-900 bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{totalUsers}</span>
-        </div>
-      );
-    }
-    
-    if (totalTeams > 0) {
-      sections.push(
-        <div key="totalTeams" className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-          <div className="flex items-center">
-            <UserGroupIcon className="h-4 w-4 text-green-600 mr-2" />
-            <span className="text-sm text-gray-600">Équipes</span>
-          </div>
-          <span className="text-sm font-medium text-gray-900 bg-green-100 text-green-800 px-2 py-1 rounded-full">{totalTeams}</span>
-        </div>
-      );
-    }
-    
-    if (totalDepartments > 0) {
-      sections.push(
-        <div key="totalDepartments" className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-          <div className="flex items-center">
-            <BuildingOfficeIcon className="h-4 w-4 text-purple-600 mr-2" />
-            <span className="text-sm text-gray-600">Départements</span>
-          </div>
-          <span className="text-sm font-medium text-gray-900 bg-purple-100 text-purple-800 px-2 py-1 rounded-full">{totalDepartments}</span>
-        </div>
-      );
-    }
-
-    if (totalSkills > 0) {
-      sections.push(
-        <div key="totalSkills" className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-          <div className="flex items-center">
-            <AcademicCapIcon className="h-4 w-4 text-orange-600 mr-2" />
-            <span className="text-sm text-gray-600">Compétences</span>
-          </div>
-          <span className="text-sm font-medium text-gray-900 bg-orange-100 text-orange-800 px-2 py-1 rounded-full">{totalSkills}</span>
-        </div>
-      );
-    }
-
-    if (sections.length === 0) {
-      return (
-        <div className="text-center py-4">
-          <p className="text-sm text-gray-500">Aucune statistique disponible</p>
-        </div>
-      );
-    }
-
-    return <div className="space-y-3">{sections}</div>;
-  };
-
-  if (!user) {
-    return null;
-  }
-
-  // Hide profile sidebar when main sidebar is expanded (on smaller screens)
-  if (isMainSidebarCollapsed && window.innerWidth < 1280) {
-    return null;
-  }
+  const roleConfig = getRoleConfig(user.role);
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full shadow-lg">
-      {/* User Profile Section */}
-      <div className="p-6 border-b border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="text-center">
-          <div className="relative inline-block mb-4">
-            {user.profilePictureUrl ? (
-              <img
-                src={getProfilePictureUrl(user.profilePictureUrl)}
-                alt={`${user.firstName} ${user.lastName}`}
-                className="w-24 h-24 rounded-full object-cover mx-auto border-4 border-gray-100 shadow-sm"
-              />
-            ) : (
-              <div className="w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto border-4 border-gray-100 shadow-sm">
-                <UserIcon className="w-12 h-12 text-white" />
+    <div className="w-80 bg-gradient-to-b from-white to-gray-50/50 border-r border-gray-100 flex flex-col h-full">
+      {/* Header with gradient overlay */}
+      <div className="relative overflow-hidden">
+        {/* Background gradient */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${roleConfig.gradient} opacity-5`} />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+        
+        {/* Profile content */}
+        <div className="relative p-6">
+          <div className="text-center">
+            {/* Avatar */}
+            <div className="relative inline-block mb-4">
+              <div className={`absolute inset-0 bg-gradient-to-br ${roleConfig.gradient} rounded-2xl blur-lg opacity-30 scale-110`} />
+              {user.profilePictureUrl ? (
+                <img
+                  src={getProfilePictureUrl(user.profilePictureUrl)}
+                  alt={`${user.firstName} ${user.lastName}`}
+                  className="relative w-24 h-24 rounded-2xl object-cover ring-4 ring-white shadow-xl"
+                />
+              ) : (
+                <div className={`relative w-24 h-24 bg-gradient-to-br ${roleConfig.gradient} rounded-2xl flex items-center justify-center ring-4 ring-white shadow-xl`}>
+                  <span className="text-white text-2xl font-bold">
+                    {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                  </span>
+                </div>
+              )}
+              {/* Online indicator */}
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-lg border-4 border-white flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full" />
               </div>
+            </div>
+            
+            {/* Name and email */}
+            <h2 className="text-xl font-bold text-gray-900 mb-1">
+              {user.firstName} {user.lastName}
+            </h2>
+            <p className="text-sm text-gray-500 mb-1">{user.email}</p>
+            {user.jobTitle && (
+              <p className="text-xs text-gray-400 mb-3">{user.jobTitle}</p>
             )}
-          </div>
-          
-          <h2 className="text-xl font-semibold text-gray-900 mb-1">
-            {user.firstName} {user.lastName}
-          </h2>
-          <p className="text-gray-600 mb-2">{user.email}</p>
-          {user.jobTitle && (
-            <p className="text-sm text-gray-500 mb-3">{user.jobTitle}</p>
-          )}
-          
-          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(user.role)}`}>
-            {getRoleLabel(user.role)}
-          </span>
-        </div>
-      </div>
-
-      {/* Account Information */}
-      <div className="p-6 border-b border-gray-200">
-        <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center">
-          <CalendarIcon className="h-4 w-4 mr-2 text-orange-600" />
-          Informations du compte
-        </h3>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
-            <span className="text-sm text-gray-600">Membre depuis:</span>
-            <span className="text-sm font-bold text-gray-900">
-              {user.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR') : 'N/A'}
+            
+            {/* Role badge */}
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r ${roleConfig.gradient} text-white shadow-lg shadow-${roleConfig.gradient.split(' ')[1]}/20`}>
+              <span>{roleConfig.icon}</span>
+              {roleConfig.label}
             </span>
           </div>
         </div>
       </div>
 
-      {/* User Statistics */}
-      <div className="p-6 flex-1">
-        <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center">
-          <ChartBarIcon className="h-4 w-4 mr-2 text-blue-600" />
-          Mes statistiques
-        </h3>
-        <div className="space-y-4">
-          {user.role === 'admin' && renderAdminStats()}
-          {user.role === 'manager' && renderManagerStats()}
-          {user.role === 'employee' && renderEmployeeStats()}
+      {/* Account Info Card */}
+      <div className="px-6 py-4">
+        <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-white border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 rounded-xl bg-amber-50">
+              <CalendarIcon className="h-4 w-4 text-amber-600" />
+            </div>
+            <span className="text-sm font-semibold text-gray-700">Informations du compte</span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-500">Membre depuis</span>
+            <span className="font-semibold text-gray-900">
+              {user.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR', { 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric' 
+              }) : 'N/A'}
+            </span>
+          </div>
         </div>
       </div>
 
+      {/* Statistics Section */}
+      <div className="flex-1 px-6 py-2 overflow-y-auto">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-2 rounded-xl bg-indigo-50">
+            <ArrowTrendingUpIcon className="h-4 w-4 text-indigo-600" />
+          </div>
+          <span className="text-sm font-semibold text-gray-700">Mes statistiques</span>
+        </div>
+        {renderStats()}
+      </div>
+
       {/* Settings Button */}
-      <div className="p-6 border-t border-gray-200">
+      <div className="p-6 pt-2">
         <button
           onClick={handleSettingsClick}
-          className="w-full flex items-center justify-center px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-all duration-200 border border-gray-200 hover:border-gray-300 hover:shadow-md"
+          className="w-full group flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-gray-900 hover:bg-gray-800 text-white font-semibold transition-all duration-300 shadow-lg shadow-gray-900/20 hover:shadow-xl hover:-translate-y-0.5"
         >
-          <CogIcon className="h-4 w-4 mr-2" />
-          Paramètres
+          <CogIcon className="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" />
+          <span>Paramètres du profil</span>
+          <SparklesIcon className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
         </button>
       </div>
     </div>

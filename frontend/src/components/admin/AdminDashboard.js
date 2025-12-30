@@ -7,13 +7,13 @@ import {
   UserGroupIcon,
   BuildingOfficeIcon,
   ChartBarIcon,
-  CogIcon,
   UserCircleIcon,
   Bars3Icon,
   InformationCircleIcon,
-  BriefcaseIcon
+  BriefcaseIcon,
+  MagnifyingGlassIcon,
+  BellIcon
 } from '@heroicons/react/24/outline';
-import Avatar from '../common/Avatar';
 import NotificationBell from '../common/NotificationBell';
 import NotificationPanel from '../common/NotificationPanel';
 import UserInfoSidebar from '../common/UserInfoSidebar';
@@ -28,9 +28,10 @@ import SkillApprovals from './SkillApprovals';
 import JobTitleManagement from './JobTitleManagement';
 import JobTitleObjectives from './JobTitleObjectives';
 import Profile from './Profile';
+import { getProfilePictureUrl } from '../../utils/imageUtils';
 
 const AdminDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationRefreshTrigger, setNotificationRefreshTrigger] = useState(0);
@@ -48,14 +49,6 @@ const AdminDashboard = () => {
     { name: 'Objectifs de Titres', href: '/admin/job-title-objectives', icon: BriefcaseIcon },
   ];
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
   const handleNotificationClick = () => {
     setShowNotifications(true);
   };
@@ -65,66 +58,95 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Column 1: Collapsible Navigation Sidebar */}
-      <div className={`${isSidebarCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 ease-in-out fixed left-0 top-0 h-full z-50`}>
+    <div className="flex min-h-screen bg-slate-50">
+      {/* Sidebar */}
+      <div className={`${isSidebarCollapsed ? 'w-20' : 'w-72'} transition-all duration-300 ease-in-out fixed left-0 top-0 h-full z-50`}>
         <CollapsibleSidebar
           navigation={navigation}
           isCollapsed={isSidebarCollapsed}
           onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           panelTitle="Admin Panel"
           panelIcon={ChartBarIcon}
-          panelColor="from-red-500 to-red-600"
+          panelColor="from-red-500 to-rose-600"
         />
       </div>
 
-      {/* Column 2: User Info Sidebar */}
-      <div className="hidden xl:block w-80 flex-shrink-0" style={{ marginLeft: isSidebarCollapsed ? '4rem' : '16rem' }}>
+      {/* User Info Sidebar - Hidden on smaller screens */}
+      <div 
+        className="hidden xl:block w-80 flex-shrink-0 fixed h-full z-40 transition-all duration-300" 
+        style={{ left: isSidebarCollapsed ? '5rem' : '18rem' }}
+      >
         <UserInfoSidebar />
       </div>
 
-      {/* Column 3: Main Content Area */}
-      <div className="flex-1 w-0 min-w-0" style={{ marginLeft: isSidebarCollapsed ? '4rem' : '16rem' }}>
-        {/* Top navigation */}
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between h-14 px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center">
+      {/* Main Content Area */}
+      <div 
+        className="flex-1 min-h-screen transition-all duration-300"
+        style={{ marginLeft: isSidebarCollapsed ? '5rem' : '18rem' }}
+      >
+        {/* Modern Top Header */}
+        <header className="sticky top-0 z-30 backdrop-blur-xl bg-white/80 border-b border-gray-100">
+          <div className="flex items-center justify-between h-16 px-6 xl:pl-[21rem]">
+            {/* Left side - Toggle & Search */}
+            <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                className="p-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200 xl:hidden"
               >
                 <Bars3Icon className="w-5 h-5" />
               </button>
+              
+              {/* Search bar */}
+              <div className="hidden md:flex items-center">
+                <div className="relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Rechercher..."
+                    className="w-64 pl-10 pr-4 py-2 bg-gray-100 border-0 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all duration-200"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-center space-x-4">
+            {/* Right side - Actions & User */}
+            <div className="flex items-center gap-3">
               {/* Notifications */}
               <NotificationBell 
                 onNotificationClick={handleNotificationClick} 
                 refreshTrigger={notificationRefreshTrigger}
               />
 
-              {/* User menu - Simplified for mobile/tablet */}
-              <div className="flex items-center space-x-3 xl:hidden">
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">{user?.firstName} {user?.lastName}</p>
-                  <p className="text-xs text-gray-500">{user?.role}</p>
+              {/* User Menu (visible on smaller screens) */}
+              <div className="flex items-center gap-3 xl:hidden">
+                <div className="h-8 w-px bg-gray-200" />
+                <div className="flex items-center gap-3">
+                  {user?.profilePictureUrl ? (
+                    <img
+                      src={getProfilePictureUrl(user.profilePictureUrl)}
+                      alt={`${user?.firstName} ${user?.lastName}`}
+                      className="w-9 h-9 rounded-xl object-cover ring-2 ring-gray-100"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl flex items-center justify-center ring-2 ring-gray-100">
+                      <span className="text-white text-xs font-bold">
+                        {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="hidden sm:block text-right">
+                    <p className="text-sm font-semibold text-gray-900">{user?.firstName} {user?.lastName}</p>
+                    <p className="text-xs text-gray-500">Administrateur</p>
+                  </div>
                 </div>
-                <Avatar user={user} size="sm" />
-                <button
-                  onClick={handleLogout}
-                  className="text-gray-400 hover:text-gray-500 hover:bg-gray-100 p-2 rounded-lg transition-colors duration-200"
-                >
-                  <CogIcon className="w-5 h-5" />
-                </button>
               </div>
             </div>
           </div>
-        </div>
+        </header>
 
-        {/* Page content */}
-        <main className="p-6 bg-gray-50 min-h-screen">
-          <div className="max-w-7xl mx-auto">
+        {/* Page Content */}
+        <main className="p-6 xl:pl-[21rem]">
+          <div className="max-w-7xl mx-auto animate-fade-in">
             <Routes>
               <Route path="/" element={<AdminOverview />} />
               <Route path="/profile" element={<Profile />} />
@@ -151,4 +173,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;

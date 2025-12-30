@@ -2,85 +2,704 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 @layer base {
   html {
     font-family: 'Inter', system-ui, sans-serif;
+    scroll-behavior: smooth;
   }
   
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-slate-50 text-gray-900 antialiased;
+    background-image: 
+      radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.03) 0, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.03) 0, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300/60 rounded-full hover:bg-gray-400/80 transition-colors;
+  }
+
+  /* Selection highlight */
+  ::selection {
+    @apply bg-indigo-100 text-indigo-900;
+  }
+
+  /* Focus visible for accessibility */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-indigo-500;
   }
 }
 
 @layer components {
+  /* ==========================================
+     MODERN BUTTON SYSTEM
+     ========================================== */
+  .btn {
+    @apply inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs gap-1.5;
+  }
+
+  .btn-md {
+    @apply px-4 py-2.5 text-sm gap-2;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base gap-2.5;
+  }
+  
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 hover:from-indigo-700 hover:via-indigo-700 hover:to-purple-700 text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 active:scale-[0.97];
   }
   
   .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+    @apply bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 border border-gray-200 hover:border-gray-300 shadow-sm active:scale-[0.97];
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-gray-100 text-gray-700 font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 active:scale-[0.97];
   }
   
   .btn-success {
-    @apply bg-success-600 hover:bg-success-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-success-500 focus:ring-offset-2;
+    @apply bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 active:scale-[0.97];
   }
   
   .btn-danger {
-    @apply bg-danger-600 hover:bg-danger-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-danger-500 focus:ring-offset-2;
+    @apply bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-lg shadow-red-500/20 hover:shadow-xl hover:shadow-red-500/30 active:scale-[0.97];
+  }
+  
+  .btn-warning {
+    @apply bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/30 active:scale-[0.97];
   }
   
   .btn-blue {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    @apply bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 active:scale-[0.97];
   }
-  
+
+  /* Icon buttons */
+  .btn-icon {
+    @apply p-2 rounded-xl transition-all duration-200 hover:bg-gray-100 active:scale-95;
+  }
+
+  .btn-icon-primary {
+    @apply p-2 rounded-xl transition-all duration-200 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 active:scale-95;
+  }
+
+  /* ==========================================
+     MODERN CARD SYSTEM
+     ========================================== */
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100/80 p-6 transition-all duration-300;
   }
-  
+
+  .card-hover {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100/80 p-6 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-200 hover:-translate-y-1;
+  }
+
+  .card-interactive {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100/80 p-6 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-indigo-100/50 hover:border-indigo-200 hover:-translate-y-1;
+  }
+
+  .card-gradient {
+    @apply rounded-2xl shadow-lg p-6 text-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .card-glass {
+    @apply backdrop-blur-xl bg-white/70 rounded-2xl shadow-lg border border-white/20 p-6;
+  }
+
+  /* ==========================================
+     MODERN FORM CONTROLS
+     ========================================== */
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 bg-white hover:border-gray-300 placeholder-gray-400 text-gray-900;
   }
-  
+
+  .input-field-glass {
+    @apply w-full px-4 py-3 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/50 transition-all duration-200 bg-white/10 backdrop-blur-sm hover:bg-white/20 placeholder-white/60 text-white;
+  }
+
+  .select-field {
+    @apply w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 bg-white hover:border-gray-300 appearance-none cursor-pointer text-gray-900;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25em 1.25em;
+    padding-right: 2.5rem;
+  }
+
+  .textarea-field {
+    @apply w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 bg-white hover:border-gray-300 placeholder-gray-400 text-gray-900 resize-none;
+  }
+
+  .form-label {
+    @apply block text-sm font-semibold text-gray-700 mb-2;
+  }
+
+  .form-hint {
+    @apply text-xs text-gray-500 mt-1.5;
+  }
+
+  /* ==========================================
+     MODERN BADGE SYSTEM
+     ========================================== */
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold;
   }
   
   .badge-success {
-    @apply bg-success-100 text-success-800;
+    @apply bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/10;
   }
   
   .badge-warning {
-    @apply bg-warning-100 text-warning-800;
+    @apply bg-amber-50 text-amber-700 ring-1 ring-amber-600/10;
   }
   
   .badge-danger {
-    @apply bg-danger-100 text-danger-800;
+    @apply bg-red-50 text-red-700 ring-1 ring-red-600/10;
   }
   
   .badge-primary {
-    @apply bg-primary-100 text-primary-800;
+    @apply bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/10;
   }
   
   .badge-blue {
-    @apply bg-blue-100 text-blue-800;
+    @apply bg-blue-50 text-blue-700 ring-1 ring-blue-600/10;
   }
 
-  /* Secondary badge used for soft skills / Confirmé labels */
   .badge-secondary {
-    @apply bg-green-100 text-green-800;
+    @apply bg-gray-100 text-gray-700 ring-1 ring-gray-600/10;
+  }
+
+  .badge-purple {
+    @apply bg-purple-50 text-purple-700 ring-1 ring-purple-600/10;
+  }
+
+  .badge-teal {
+    @apply bg-teal-50 text-teal-700 ring-1 ring-teal-600/10;
+  }
+
+  .badge-pink {
+    @apply bg-pink-50 text-pink-700 ring-1 ring-pink-600/10;
+  }
+
+  /* Pill badges */
+  .badge-pill {
+    @apply rounded-full px-3;
+  }
+
+  /* ==========================================
+     MODERN STAT CARDS
+     ========================================== */
+  .stat-card {
+    @apply relative bg-white rounded-2xl p-6 shadow-sm border border-gray-100/80 transition-all duration-300 overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1;
+  }
+
+  .stat-card::before {
+    content: '';
+    @apply absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 rounded-full -translate-y-1/2 translate-x-1/2 transition-transform duration-500 group-hover:scale-150;
+  }
+
+  .stat-card-gradient {
+    @apply relative rounded-2xl p-6 shadow-lg overflow-hidden text-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .stat-value {
+    @apply text-3xl font-bold tracking-tight;
+  }
+
+  .stat-label {
+    @apply text-sm font-medium text-gray-500 mt-1;
+  }
+
+  .stat-change {
+    @apply inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full mt-2;
+  }
+
+  .stat-change-positive {
+    @apply bg-emerald-50 text-emerald-700;
+  }
+
+  .stat-change-negative {
+    @apply bg-red-50 text-red-700;
+  }
+
+  /* ==========================================
+     MODERN TABLE STYLES
+     ========================================== */
+  .table-modern {
+    @apply w-full border-collapse;
+  }
+
+  .table-modern thead {
+    @apply bg-gray-50/80 sticky top-0;
+  }
+
+  .table-modern th {
+    @apply px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider;
+  }
+
+  .table-modern td {
+    @apply px-6 py-4 text-sm text-gray-700;
+  }
+
+  .table-modern tbody tr {
+    @apply border-b border-gray-100 transition-colors duration-150 hover:bg-indigo-50/30;
+  }
+
+  .table-modern tbody tr:last-child {
+    @apply border-b-0;
+  }
+
+  /* ==========================================
+     MODERN MODAL STYLES
+     ========================================== */
+  .modal-backdrop {
+    @apply fixed inset-0 bg-gray-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .modal-content {
+    @apply bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden;
+    animation: modalSlideUp 0.3s ease-out;
+  }
+
+  .modal-header {
+    @apply px-6 py-4 border-b border-gray-100 flex items-center justify-between;
+  }
+
+  .modal-body {
+    @apply px-6 py-5 overflow-y-auto;
+  }
+
+  .modal-footer {
+    @apply px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 bg-gray-50/50;
+  }
+
+  /* ==========================================
+     MODERN SIDEBAR STYLES
+     ========================================== */
+  .sidebar {
+    @apply bg-white h-full border-r border-gray-100 shadow-xl shadow-gray-200/40;
+  }
+
+  .sidebar-dark {
+    @apply bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 h-full text-white;
+  }
+
+  .sidebar-nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900;
+  }
+
+  .sidebar-nav-item-active {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25;
+  }
+
+  .sidebar-nav-item-dark {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-300 transition-all duration-200 hover:bg-white/10 hover:text-white;
+  }
+
+  .sidebar-nav-item-dark-active {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25;
+  }
+
+  /* ==========================================
+     MODERN AVATAR STYLES
+     ========================================== */
+  .avatar {
+    @apply rounded-full object-cover ring-2 ring-white shadow-md;
+  }
+
+  .avatar-group {
+    @apply flex -space-x-3;
+  }
+
+  .avatar-group .avatar {
+    @apply ring-2 ring-white hover:z-10 hover:scale-110 transition-transform;
+  }
+
+  /* ==========================================
+     MODERN PROGRESS STYLES
+     ========================================== */
+  .progress-bar {
+    @apply h-2 bg-gray-100 rounded-full overflow-hidden;
+  }
+
+  .progress-bar-fill {
+    @apply h-full rounded-full transition-all duration-500 ease-out;
+  }
+
+  .progress-bar-gradient {
+    @apply h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600;
+  }
+
+  /* ==========================================
+     MODERN HEADER STYLES
+     ========================================== */
+  .page-header {
+    @apply mb-8;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-gray-900 tracking-tight;
+  }
+
+  .page-subtitle {
+    @apply text-gray-500 mt-1;
+  }
+
+  /* ==========================================
+     MODERN EMPTY STATE
+     ========================================== */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-16 text-center;
+  }
+
+  .empty-state-icon {
+    @apply w-16 h-16 text-gray-300 mb-4;
+  }
+
+  .empty-state-title {
+    @apply text-lg font-semibold text-gray-900 mb-2;
+  }
+
+  .empty-state-description {
+    @apply text-gray-500 max-w-sm;
+  }
+
+  /* ==========================================
+     MODERN DROPDOWN STYLES
+     ========================================== */
+  .dropdown-menu {
+    @apply absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50;
+    animation: dropdownIn 0.15s ease-out;
+  }
+
+  .dropdown-item {
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer;
+  }
+
+  .dropdown-item-danger {
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer;
+  }
+
+  /* ==========================================
+     MODERN TOOLTIP STYLES
+     ========================================== */
+  .tooltip {
+    @apply absolute z-50 px-3 py-2 text-xs font-medium text-white bg-gray-900 rounded-lg shadow-lg;
+    animation: tooltipIn 0.15s ease-out;
+  }
+
+  .tooltip::after {
+    content: '';
+    @apply absolute border-4 border-transparent;
+  }
+
+  /* ==========================================
+     MODERN SKELETON LOADING
+     ========================================== */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 rounded-lg;
+  }
+
+  .skeleton-text {
+    @apply h-4 bg-gray-200 rounded animate-pulse;
+  }
+
+  .skeleton-circle {
+    @apply rounded-full bg-gray-200 animate-pulse;
   }
 }
 
 @layer utilities {
+  /* ==========================================
+     GRADIENT TEXT UTILITIES
+     ========================================== */
   .text-gradient {
-    @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent;
   }
-  
+
+  .text-gradient-warm {
+    @apply bg-gradient-to-r from-orange-500 via-rose-500 to-pink-500 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-cool {
+    @apply bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-success {
+    @apply bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent;
+  }
+
+  /* ==========================================
+     ANIMATION UTILITIES
+     ========================================== */
   .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out;
+    animation: fadeIn 0.3s ease-out;
   }
   
   .animate-slide-up {
     animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-soft {
+    animation: pulseSoft 2s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background-size: 200% 100%;
+  }
+
+  /* ==========================================
+     GLASS MORPHISM UTILITIES
+     ========================================== */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl;
+  }
+
+  .glass-dark {
+    @apply bg-gray-900/80 backdrop-blur-xl border border-white/10 shadow-xl;
+  }
+
+  .glass-colored {
+    @apply backdrop-blur-xl border border-white/20 shadow-xl;
+  }
+
+  /* ==========================================
+     GRADIENT BACKGROUND UTILITIES
+     ========================================== */
+  .bg-gradient-radial {
+    background: radial-gradient(circle at center, var(--tw-gradient-from), var(--tw-gradient-to));
+  }
+
+  .bg-gradient-conic {
+    background: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-from), var(--tw-gradient-to));
+  }
+
+  .bg-mesh-gradient {
+    background-color: #fafafa;
+    background-image: 
+      radial-gradient(at 40% 20%, hsla(228,100%,74%,0.1) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsla(189,100%,56%,0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsla(355,100%,93%,0.1) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, hsla(340,100%,76%,0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(22,100%,77%,0.1) 0px, transparent 50%),
+      radial-gradient(at 80% 100%, hsla(242,100%,70%,0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 0%, hsla(343,100%,76%,0.1) 0px, transparent 50%);
+  }
+
+  /* ==========================================
+     HOVER EFFECT UTILITIES
+     ========================================== */
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+
+  .hover-glow {
+    @apply transition-shadow duration-300;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 30px -5px var(--glow-color, rgba(99, 102, 241, 0.4));
+  }
+
+  /* ==========================================
+     RING/FOCUS UTILITIES
+     ========================================== */
+  .ring-glow {
+    @apply ring-4 ring-indigo-500/20;
+  }
+
+  /* ==========================================
+     CUSTOM SPACING & SIZING
+     ========================================== */
+  .container-narrow {
+    @apply max-w-4xl mx-auto;
+  }
+
+  .container-wide {
+    @apply max-w-7xl mx-auto;
+  }
+
+  /* ==========================================
+     SCROLL UTILITIES
+     ========================================== */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+}
+
+/* ==========================================
+   KEYFRAME ANIMATIONS
+   ========================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slideInRight {
+  from { 
+    opacity: 0; 
+    transform: translateX(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+@keyframes scaleIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes bounceIn {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.3); 
+  }
+  50% { 
+    transform: scale(1.05); 
+  }
+  70% { 
+    transform: scale(0.9); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.7; 
+  }
+}
+
+@keyframes shimmer {
+  0% { 
+    background-position: -200% 0; 
+  }
+  100% { 
+    background-position: 200% 0; 
+  }
+}
+
+@keyframes modalSlideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+@keyframes dropdownIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px) scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+@keyframes tooltipIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes spin-slow {
+  from { 
+    transform: rotate(0deg); 
+  }
+  to { 
+    transform: rotate(360deg); 
   }
 } 

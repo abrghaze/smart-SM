@@ -270,140 +270,187 @@ const Targets = () => {
 
   if (loading && targets.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full border-4 border-gray-200 border-t-indigo-500 animate-spin mb-4" />
+          <p className="text-gray-500 font-medium">Chargement de vos objectifs...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Mes objectifs</h1>
-          <p className="text-gray-600">Suivez vos objectifs et vos progrès</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <FlagIcon className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Mes Objectifs</h1>
+                <p className="text-gray-600 mt-1">Suivez vos objectifs et vos progrès</p>
+              </div>
+            </div>
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] flex items-center space-x-2"
+            >
+              <ArrowPathIcon className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
+              <span>{refreshing ? 'Actualisation...' : 'Actualiser'}</span>
+            </button>
+          </div>
         </div>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <ArrowPathIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-          {refreshing ? 'Actualisation...' : 'Actualiser'}
-        </button>
-      </div>
 
       {targets.length === 0 ? (
-        <div className="card text-center py-12">
-          <FlagIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun objectif assigné</h3>
-          <p className="text-gray-600">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 text-center py-16">
+          <div className="w-20 h-20 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <FlagIcon className="h-10 w-10 text-indigo-500" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">Aucun objectif assigné</h3>
+          <p className="text-gray-500 max-w-md mx-auto">
             Vous n'avez pas encore d'objectifs assignés. Contactez votre manager pour en discuter.
           </p>
         </div>
       ) : (
         <div className="space-y-4">
           {targets.map((target) => (
-            <div key={target.id} className={`card ${target.isTeamContribution ? 'border-l-4 border-l-blue-500 bg-blue-50' : ''}`}>
+            <div 
+              key={target.id} 
+              className={`bg-white rounded-2xl shadow-sm border-2 p-6 transition-all duration-200 hover:shadow-lg ${
+                target.isTeamContribution 
+                  ? 'border-l-4 border-l-blue-500 border-blue-100 bg-gradient-to-r from-blue-50 to-white' 
+                  : 'border-gray-100 hover:border-indigo-200'
+              }`}
+            >
               <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center flex-wrap">
                     {target.isTeamContribution ? (
                       <>
-                        Contribution à l'objectif d'équipe: {target.title}
-                        <span className="ml-2 text-sm text-blue-600 font-normal">
-                          (Équipe: {target.team?.name || 'Non assigné'})
+                        <span className="mr-2">Contribution à l'objectif d'équipe: {target.title}</span>
+                        <span className="text-sm font-medium text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                          Équipe: {target.team?.name || 'Non assigné'}
                         </span>
                       </>
                     ) : target.isIndividualTarget ? (
                       <>
-                        {target.individualTitle || target.title}
-                        <span className="ml-2 text-sm text-green-600 font-normal">
-                          (Objectif personnalisé)
+                        <span className="mr-2">{target.individualTitle || target.title}</span>
+                        <span className="text-sm font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">
+                          Objectif personnalisé
                         </span>
                       </>
                     ) : (
                       target.title
                     )}
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 mt-2">
                     {target.isTeamContribution ? (target.contributionDescription || target.description) : 
                      target.isIndividualTarget ? (target.individualDescription || target.description) : 
                      target.description}
                   </p>
                   {target.isTeamContribution && (
-                    <p className="text-sm text-blue-600 mt-1">
-                      Objectif d'équipe: {target.title}
+                    <p className="text-sm text-blue-600 mt-2 bg-blue-50 inline-block px-3 py-1 rounded-lg">
+                      🎯 Objectif d'équipe: {target.title}
                     </p>
                   )}
                   {target.isIndividualTarget && target.individualDescription && (
-                    <p className="text-sm text-green-600 mt-1">
-                      Description personnalisée: {target.individualDescription}
+                    <p className="text-sm text-green-600 mt-2 bg-green-50 inline-block px-3 py-1 rounded-lg">
+                      📝 {target.individualDescription}
                     </p>
                   )}
                   {target.isIndividualTarget && target.individualFile && (
-                    <div className="flex items-center text-sm text-green-600 mt-1">
-                      <DocumentIcon className="h-4 w-4 mr-1" />
-                      Fichier attaché: {target.individualFile.name}
-                      <button className="ml-2 px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">
+                    <div className="flex items-center text-sm text-green-600 mt-2 bg-green-50 inline-flex px-3 py-2 rounded-lg">
+                      <DocumentIcon className="h-4 w-4 mr-2" />
+                      <span className="mr-3">Fichier: {target.individualFile.name}</span>
+                      <button className="px-3 py-1 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium">
                         Télécharger
                       </button>
                     </div>
                   )}
                 </div>
-                <div className="flex flex-col items-end space-y-2">
+                <div className="flex flex-col items-end space-y-2 ml-4">
                   {target.isTeamContribution && (
-                    <span className="badge badge-blue text-xs">
-                      Contribution d'équipe
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm">
+                      👥 Contribution d'équipe
                     </span>
                   )}
-                  <span className={`badge ${getStatusColor(getCalculatedStatus(target))}`}>
-                    {target.status === 'pending_approval' ? 'En attente d\'approbation' : getStatusLabel(getCalculatedStatus(target))}
+                  <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${
+                    getCalculatedStatus(target) === 'completed' 
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
+                      : getCalculatedStatus(target) === 'in_progress'
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white'
+                      : target.status === 'pending_approval'
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {target.status === 'pending_approval' ? '⏳ En attente d\'approbation' : getStatusLabel(getCalculatedStatus(target))}
                   </span>
                 </div>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {/* Only show skill information for individual objectives, not team contributions */}
                 {!target.isTeamContribution && (
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Compétence: {target.skill?.name || 'Non spécifiée'}</span>
-                  <span>Niveau {target.targetLevel || 'Non spécifié'}</span>
-                </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600 flex items-center">
+                      <span className="w-2 h-2 bg-indigo-400 rounded-full mr-2"></span>
+                      Compétence: <span className="font-medium text-gray-900 ml-1">{target.skill?.name || 'Non spécifiée'}</span>
+                    </span>
+                    <span className="text-gray-600 flex items-center">
+                      <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                      Niveau cible: <span className="font-semibold text-indigo-600 ml-1">{target.targetLevel || 'Non spécifié'}</span>
+                    </span>
+                  </div>
                 )}
                 
-                
+                {/* Progress Bar */}
                 <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>Progression</span>
-                    <span>{target.progress || 0}%</span>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500 font-medium">Progression</span>
+                    <span className={`font-bold ${
+                      (target.progress || 0) >= 100 ? 'text-green-600' :
+                      (target.progress || 0) >= 50 ? 'text-blue-600' : 'text-indigo-600'
+                    }`}>{target.progress || 0}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                     <div 
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        target.isTeamContribution ? 'bg-blue-600' : 'bg-green-600'
+                      className={`h-3 rounded-full transition-all duration-500 ${
+                        target.isTeamContribution 
+                          ? 'bg-gradient-to-r from-blue-500 to-blue-600' 
+                          : (target.progress || 0) >= 100 
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-500'
+                          : 'bg-gradient-to-r from-indigo-500 to-purple-500'
                       }`}
                       style={{ width: `${target.progress || 0}%` }}
                     ></div>
                   </div>
                 </div>
                 
-                <div className="flex justify-between items-center text-sm">
-                  <div className="flex items-center text-gray-500">
-                    <ClockIcon className="h-4 w-4 mr-1" />
-                    Échéance: {target.isIndividualTarget && target.individualDeadline ? 
-                      formatDate(target.individualDeadline) : 
-                      formatDate(target.deadline)}
+                {/* Footer */}
+                <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <ClockIcon className="h-5 w-5 mr-2 text-gray-400" />
+                    <span>Échéance: <span className="font-medium text-gray-700">
+                      {target.isIndividualTarget && target.individualDeadline ? 
+                        formatDate(target.individualDeadline) : 
+                        formatDate(target.deadline)}
+                    </span></span>
                     {target.isIndividualTarget && target.individualDeadline && (
-                      <span className="ml-1 text-xs text-green-600">
-                        (personnalisée)
+                      <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-600 rounded-full font-medium">
+                        personnalisée
                       </span>
                     )}
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-3">
                     <button 
                       onClick={() => handleViewDetails(target)}
-                      className="btn-secondary text-sm"
+                      className="px-4 py-2 border-2 border-gray-200 text-gray-700 rounded-xl hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200 font-medium text-sm"
                     >
                       Voir détails
                     </button>
@@ -416,10 +463,14 @@ const Targets = () => {
                         });
                         setShowProgressModal(true);
                       }}
-                      className={`text-sm ${target.isTeamContribution ? 'btn-blue' : 'btn-primary'}`}
+                      className={`px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
+                        target.isTeamContribution 
+                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700' 
+                          : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700'
+                      }`}
                       disabled={loading || target.status === 'pending_approval'}
                     >
-                      {target.status === 'pending_approval' ? 'En attente' : 'Mettre à jour'}
+                      {target.status === 'pending_approval' ? '⏳ En attente' : '📈 Mettre à jour'}
                     </button>
                   </div>
                 </div>
@@ -610,6 +661,7 @@ const Targets = () => {
           }
         }}
       />
+      </div>
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import dataService from '../../services/dataService';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, XMarkIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
 import { getSkillLevelName, getSkillLevelOptions } from '../../utils/skillLevels';
 import SkillCard from '../common/SkillCard';
 
@@ -215,41 +215,74 @@ const ManagerSkills = () => {
 
   if (loading && userSkills.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 rounded-full border-4 border-gray-200 border-t-green-500 animate-spin mb-4" />
+          <p className="text-gray-500 font-medium">Chargement de vos compétences...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Mes Compétences</h1>
-            <p className="text-gray-600">Gérez vos compétences et demandez des améliorations</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <AcademicCapIcon className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Mes Compétences</h1>
+                <p className="text-gray-600 mt-1">Gérez vos compétences et demandez des améliorations</p>
+              </div>
+            </div>
+            <button
+              onClick={async () => {
+                await loadAvailableApprovers();
+                setShowNewSkillModal(true);
+              }}
+              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center space-x-2"
+            >
+              <PlusIcon className="w-5 h-5" />
+              <span>Demander une compétence</span>
+            </button>
           </div>
-          <button
-            onClick={() => setShowNewSkillModal(true)}
-                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
-          >
-            <PlusIcon className="h-5 w-5 mr-2" />
-            Demander une compétence
-          </button>
         </div>
-      </div>
 
-      {/* Skills Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {userSkills.map((skill) => (
-          <SkillCard
-            key={skill.id}
-            skill={skill}
-            isLoading={loading}
-          />
-        ))}
-      </div>
+        {/* Skills Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {userSkills.map((skill) => (
+            <SkillCard
+              key={skill.id}
+              skill={skill}
+              isLoading={loading}
+            />
+          ))}
+        </div>
+
+        {userSkills.length === 0 && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 text-center py-16">
+            <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <AcademicCapIcon className="h-10 w-10 text-green-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Vous n'avez pas encore de compétences</h3>
+            <p className="text-gray-500 mb-6">Commencez par demander votre première compétence</p>
+            <button
+              onClick={async () => {
+                await loadAvailableApprovers();
+                setShowNewSkillModal(true);
+              }}
+              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 font-semibold shadow-lg"
+            >
+              Demander votre première compétence
+            </button>
+          </div>
+        )}
 
       {/* New Skill Modal */}
       {showNewSkillModal && (
@@ -514,7 +547,7 @@ const ManagerSkills = () => {
                 <button
                   onClick={handleRequestNewSkill}
                   disabled={loading || !newSkillRequest.certificateFile}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg"
+                  className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-700 text-white rounded-xl hover:from-green-700 hover:to-emerald-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg"
                 >
                   {loading ? 'Envoi...' : 'Envoyer la demande'}
                 </button>
@@ -523,7 +556,7 @@ const ManagerSkills = () => {
           </div>
         </div>
       )}
-
+      </div>
     </div>
   );
 };

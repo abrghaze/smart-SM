@@ -822,87 +822,144 @@ const AdminOverview = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg font-medium">Chargement du tableau de bord...</p>
+          <div className="relative">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-indigo-500/30">
+              <ChartBarIcon className="h-10 w-10 text-white animate-pulse" />
+            </div>
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 blur-xl" />
+          </div>
+          <p className="text-gray-600 text-lg font-semibold">Chargement du tableau de bord...</p>
+          <p className="text-gray-400 text-sm mt-1">Préparation de vos données</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen p-8">
-      {/* Header */}
-      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-        <div className="flex items-center space-x-4 mb-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-            <ChartBarIcon className="h-8 w-8 text-white" />
+    <div className="space-y-8">
+      {/* Modern Header */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 rounded-3xl shadow-2xl p-8 text-white">
+        {/* Background decorations */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+        
+        <div className="relative flex items-start justify-between">
+          <div className="flex items-center space-x-5">
+            <div className="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/20 shadow-lg">
+              <ChartBarIcon className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white">
+                Tableau de bord administrateur
+              </h1>
+              <p className="text-indigo-200 mt-1">Vue d'ensemble complète du système Smart Skill Matrix</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Tableau de bord administrateur
-            </h1>
-            <p className="text-gray-600 text-lg mt-2">Vue d'ensemble complète du système Smart Skill Matrix</p>
+          
+          {/* Quick stats summary */}
+          <div className="hidden lg:flex items-center gap-6 bg-white/10 backdrop-blur-xl rounded-2xl px-6 py-3 border border-white/20">
+            <div className="text-center">
+              <p className="text-2xl font-bold">{stats[0]?.value || 0}</p>
+              <p className="text-xs text-indigo-200">Utilisateurs</p>
+            </div>
+            <div className="w-px h-10 bg-white/20" />
+            <div className="text-center">
+              <p className="text-2xl font-bold">{stats[1]?.value || 0}</p>
+              <p className="text-xs text-indigo-200">Compétences</p>
+            </div>
+            <div className="w-px h-10 bg-white/20" />
+            <div className="text-center">
+              <p className="text-2xl font-bold">{stats[2]?.value || 0}</p>
+              <p className="text-xs text-indigo-200">Équipes</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <div
-            key={stat.name}
-            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 cursor-pointer hover:shadow-xl hover:border-indigo-200 transition-all duration-300 hover:scale-105"
-            onClick={() => handleCardClick(stat.route)}
-          >
-            <div className="flex items-center">
-              <div className={`p-4 rounded-xl shadow-lg ${stat.color}`}>
-                <stat.icon className="h-7 w-7 text-white" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-semibold text-gray-600">{stat.name}</p>
-                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+      {/* Modern Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+        {stats.map((stat, index) => {
+          const gradients = [
+            'from-blue-500 to-indigo-600',
+            'from-emerald-500 to-teal-600',
+            'from-violet-500 to-purple-600',
+            'from-amber-500 to-orange-600',
+            'from-rose-500 to-pink-600'
+          ];
+          const bgColors = [
+            'bg-blue-50',
+            'bg-emerald-50',
+            'bg-violet-50',
+            'bg-amber-50',
+            'bg-rose-50'
+          ];
+          const iconColors = [
+            'text-blue-600',
+            'text-emerald-600',
+            'text-violet-600',
+            'text-amber-600',
+            'text-rose-600'
+          ];
+          
+          return (
+            <div
+              key={stat.name}
+              className="group relative bg-white rounded-2xl shadow-sm border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1 overflow-hidden"
+              onClick={() => handleCardClick(stat.route)}
+            >
+              {/* Decorative gradient blob */}
+              <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${gradients[index % 5]} opacity-5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500`} />
+              
+              <div className="relative">
+                <div className={`inline-flex p-3 rounded-xl ${bgColors[index % 5]} mb-4`}>
+                  <stat.icon className={`h-6 w-6 ${iconColors[index % 5]}`} />
+                </div>
+                
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-500">{stat.name}</p>
+                  <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                </div>
+                
+                <div className="mt-4 flex items-center gap-2">
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                    stat.changeType === 'positive' ? 'bg-emerald-50 text-emerald-700' :
+                    stat.changeType === 'negative' ? 'bg-red-50 text-red-700' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {stat.change}
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="mt-4">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                stat.changeType === 'positive' ? 'bg-green-100 text-green-800' :
-                stat.changeType === 'negative' ? 'bg-red-100 text-red-800' :
-                'bg-gray-100 text-gray-800'
-              }`}>
-                {stat.change}
-              </span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 gap-8">
+      <div className="grid grid-cols-1 gap-6">
 
 
         {/* Skill Distribution Chart */}
         <div 
-          className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 cursor-pointer hover:shadow-2xl transition-all duration-300"
+          className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300"
           onClick={() => setShowSkillDistributionModal(true)}
         >
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
-              <AcademicCapIcon className="h-6 w-6 text-white" />
-        </div>
-                          <div>
-                <h3 className="text-xl font-bold text-gray-900">Distribution des compétences</h3>
-                <p className="text-gray-600">Compétences techniques et comportementales affichées simultanément</p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-3 rounded-xl bg-emerald-50">
+                <AcademicCapIcon className="h-6 w-6 text-emerald-600" />
               </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Distribution des compétences</h3>
+                <p className="text-sm text-gray-500">Compétences techniques et comportementales</p>
+              </div>
+            </div>
+            <span className="text-xs text-gray-400 group-hover:text-indigo-600 transition-colors">Cliquer pour détails →</span>
           </div>
                       <ResponsiveContainer width="100%" height={300}>
               {(() => {
-                console.log('🔍 Skill distribution data:', skillDistributionData);
-                console.log('🔍 Hard skills:', skillDistributionData?.hard);
-                console.log('🔍 Soft skills:', skillDistributionData?.soft);
-                console.log('🔍 Hard skills length:', skillDistributionData?.hard?.length);
-                console.log('🔍 Soft skills length:', skillDistributionData?.soft?.length);
                 return skillDistributionData && skillDistributionData.hard && skillDistributionData.soft && 
                        skillDistributionData.hard.length > 0 && skillDistributionData.soft.length > 0;
               })() ? (
@@ -910,26 +967,27 @@ const AdminOverview = () => {
                   {/* Both charts side by side */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Hard Skills Chart */}
-                    <div>
+                    <div className="bg-slate-50 rounded-xl p-4">
                       <div className="text-center mb-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-blue-100 text-blue-700">
                           🔧 Compétences Techniques
                         </span>
                       </div>
                       
-                      <ResponsiveContainer width="100%" height={250}>
+                      <ResponsiveContainer width="100%" height={220}>
                         <BarChart data={skillDistributionData.hard}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} />
-                          <YAxis domain={[0, 5]} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                          <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 11 }} />
+                          <YAxis domain={[0, 5]} tick={{ fontSize: 11 }} />
                           <Tooltip 
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}
                             formatter={(value, name) => {
                               if (name === 'level') return [`Niveau ${value}/5`, 'Niveau moyen'];
                               if (name === 'users') return [value, 'Utilisateurs'];
                               return [value, name];
                             }}
                           />
-                          <Bar dataKey="level" name="level">
+                          <Bar dataKey="level" name="level" radius={[6, 6, 0, 0]}>
                             {skillDistributionData.hard.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
@@ -939,26 +997,27 @@ const AdminOverview = () => {
                     </div>
 
                     {/* Soft Skills Chart */}
-                    <div>
+                    <div className="bg-slate-50 rounded-xl p-4">
                       <div className="text-center mb-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-emerald-100 text-emerald-700">
                           💬 Compétences Comportementales
                         </span>
                       </div>
                       
-                      <ResponsiveContainer width="100%" height={250}>
+                      <ResponsiveContainer width="100%" height={220}>
                         <BarChart data={skillDistributionData.soft}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} />
-                          <YAxis domain={[0, 5]} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                          <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 11 }} />
+                          <YAxis domain={[0, 5]} tick={{ fontSize: 11 }} />
                           <Tooltip 
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}
                             formatter={(value, name) => {
                               if (name === 'level') return [`Niveau ${value}/5`, 'Niveau moyen'];
                               if (name === 'users') return [value, 'Utilisateurs'];
                               return [value, name];
                             }}
                           />
-                          <Bar dataKey="level" name="level">
+                          <Bar dataKey="level" name="level" radius={[6, 6, 0, 0]}>
                             {skillDistributionData.soft.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
@@ -972,13 +1031,15 @@ const AdminOverview = () => {
           </div>
         ) : (
                 <div className="flex items-center justify-center h-full">
-                  <div className="text-center text-gray-500">
-                    <AcademicCapIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                    <p className="text-lg font-medium">
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 flex items-center justify-center">
+                      <AcademicCapIcon className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <p className="text-lg font-medium text-gray-900">
                       {!skillDistributionData.hard || !skillDistributionData.soft ? 'Chargement...' : 'Aucune compétence'}
                     </p>
-                    <p className="text-sm">
-                      {!skillDistributionData.hard || !skillDistributionData.soft ? 'Récupération des données...' : 'Aucune compétence trouvée dans l\'entreprise'}
+                    <p className="text-sm text-gray-500 mt-1">
+                      {!skillDistributionData.hard || !skillDistributionData.soft ? 'Récupération des données...' : 'Aucune compétence trouvée'}
                     </p>
                   </div>
                 </div>

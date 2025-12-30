@@ -5,7 +5,7 @@ import dataService from '../../services/dataService';
 
 const NotificationBell = ({ onNotificationClick, refreshTrigger }) => {
   const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     fetchUnreadCount();
@@ -14,6 +14,7 @@ const NotificationBell = ({ onNotificationClick, refreshTrigger }) => {
     const interval = setInterval(fetchUnreadCount, 30000);
     
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Watch for refresh trigger from parent component
@@ -21,14 +22,23 @@ const NotificationBell = ({ onNotificationClick, refreshTrigger }) => {
     if (refreshTrigger) {
       fetchUnreadCount();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger]);
 
   const fetchUnreadCount = async () => {
     try {
       const response = await dataService.getUnreadNotificationCount();
-      setUnreadCount(response.unreadCount || 0);
+      const newCount = response.unreadCount || 0;
+      
+      // Animate if count increased
+      if (newCount > unreadCount) {
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 500);
+      }
+      
+      setUnreadCount(newCount);
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      // Silent fail for notification count
     }
   };
 
@@ -41,17 +51,20 @@ const NotificationBell = ({ onNotificationClick, refreshTrigger }) => {
   return (
     <button
       onClick={handleClick}
-      className="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full transition-colors"
-      disabled={loading}
+      className={`relative p-2.5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+        unreadCount > 0 
+          ? 'bg-red-50 text-red-600 hover:bg-red-100' 
+          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+      } ${isAnimating ? 'animate-bounce' : ''}`}
     >
       {unreadCount > 0 ? (
-        <BellIconSolid className="h-6 w-6 text-red-500" />
+        <BellIconSolid className="h-5 w-5" />
       ) : (
-        <BellIcon className="h-6 w-6" />
+        <BellIcon className="h-5 w-5" />
       )}
       
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+        <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 bg-gradient-to-r from-red-500 to-rose-600 text-white text-xs rounded-full flex items-center justify-center font-bold shadow-lg shadow-red-500/30 animate-pulse">
           {unreadCount > 99 ? '99+' : unreadCount}
         </span>
       )}
